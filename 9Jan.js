@@ -113,10 +113,11 @@ let dbHotel = require('./model/hotel')
 //     return new Promise(async(resolve, reject) => {
 //         let restaurants = await dbHotel.find({ 'grades.score': { $gt: 80, $lt: 100 } })
 //         resolve(restaurants)
-//         // let restaurants = await dbHotel.find({ grades: { $elemMatch: { "score": { $gt: 80, $lt: 100 } } } })
-//         // resolve(restaurants)
+//             // let restaurants = await dbHotel.find({ grades: { $elemMatch: { "score": { $gt: 80, $lt: 100 } } } })
+//             // resolve(restaurants)
 //     })
 // }
+
 
 // display().then(data => console.log('---------restaurants-------', data, '---------restaurants-------'))
 
@@ -162,8 +163,22 @@ let dbHotel = require('./model/hotel')
 
 // Question 10. Write an aggregation query which finds the total no of restaurants serving cuisine ‘Italian’ and ‘Bakery’ in borough bronx.
 
+// dbHotel.aggregate([{ $group: { _id: "cuisine", totalRestaurants: { $sum: 1 } } }])
 
 
+// let display = () => {
+//     return new Promise(async(resolve, reject) => {
+//         let restaurants = await dbHotel.aggregate([
+//             { $match: { cuisine: { $in: ["Bakery", "Italian"] } } },
+//             { $group: { _id: "cuisine", totalRestaurants: { $sum: 1 } } }
+//         ])
+//         resolve(restaurants)
+//             // let restaurants = await dbHotel.find({ grades: { $elemMatch: { "score": { $gt: 80, $lt: 100 } } } })
+//             // resolve(restaurants)
+//     })
+// }
+
+// display().then(data => console.log('---------restaurants-------', data, '---------restaurants-------'))
 
 
 
@@ -172,8 +187,11 @@ let dbHotel = require('./model/hotel')
 
 // let display = () => {
 //     return new Promise(async(resolve, reject) => {
-//         let restaurants = await dbHotel.find({ borough: 'Brooklyn' }, { "borough": 1, "cuisine": 1 }).distinct('cuisine')
-//         resolve(restaurants.length)
+//         let restaurants = await dbHotel.aggregate([
+//             { $match: { borough: "Brooklyn" } },
+//             { $group: { _id: "$cuisine", total: { $sum: 1 } } }
+//         ])
+//         resolve(restaurants)
 //             // let uniqueCuisine = restaurants.filter((cuisineType, index, self) => self.indexOf(cuisineType) === index)
 //             // resolve(uniqueCuisine)
 //     })
@@ -195,9 +213,12 @@ let dbHotel = require('./model/hotel')
 
 // Question 12. Write a MongoDB query to find the restaurant Id, name, address and geographical location for those restaurants where 2nd element of coord array contains a value which is more than 42 and upto 52.
 
+
+// { $gt: 42, $lte: 52 }
+
 // let display = () => {
 //     return new Promise(async(resolve, reject) => {
-//         let restaurants = await dbHotel.find({ 'address.coord[1]': { $gt: 42, $lte: 52 } }, { "restaurant_id": 1, "name": 1, "address": 1 }).limit(100)
+//         let restaurants = await dbHotel.find({ 'address.coord.1': { $gt: 42, $lte: 52 } }, { "restaurant_id": 1, "name": 1, "address": 1 }).limit(100)
 //         resolve(restaurants)
 //     })
 // }
@@ -220,21 +241,11 @@ let dbHotel = require('./model/hotel')
 
 // let display = () => {
 //     return new Promise(async(resolve, reject) => {
-//         let restaurants = await dbHotel.find({}, { borough: 1, name: 1 }).limit(100)
-//         if (!restaurants) console.log('Restaurants not found')
-//         else {
-//             let uniqueRestaurants = restaurants
-//                 .map(name => name.name)
-//                 .filter((orderSGID, index, self) => self.indexOf(orderSGID) === index)
+//         let restaurants = await dbHotel.aggregate([
+//             { $group: { _id: "$borough", totalRestaurants: { $sum: 1 } } },
+//         ])
 
-//             let uniqueRestaurants = restaurants
-//                 .map(data => data.borough)
-//                 .filter((orderSGID, index, self) => self.indexOf(orderSGID) === index)
-
-
-//             resolve(uniqueRestaurants.length)
-
-//         }
+//         resolve(restaurants)
 //     })
 // }
 
@@ -256,7 +267,9 @@ let dbHotel = require('./model/hotel')
 
 // let display = () => {
 //     return new Promise(async(resolve, reject) => {
-//         let restaurants = await dbHotel.find({ 'address.coord[1]': { $gt: 42, $lte: 52 } }, { "restaurant_id": 1, "name": 1, "address": 1 }).limit(100)
+//         let restaurants = await dbHotel.aggregate([
+//             { $group: { _id: "$cuisine", count: { $sum: 1 } } }
+//         ])
 //         resolve(restaurants)
 //     })
 // }
@@ -302,7 +315,7 @@ let dbHotel = require('./model/hotel')
 
 // let display = () => {
 //     return new Promise(async(resolve, reject) => {
-//         let restaurants = await dbHotel.find({ name: /.*mon.* / }, { "name": 1, "borough": 1, "address.coord": 1, cuisine: 1 }).limit(100)
+//         let restaurants = await dbHotel.find({ 'address.street': { $exits: true } }).limit(100)
 //         resolve(restaurants)
 //     })
 // }
@@ -324,7 +337,7 @@ let dbHotel = require('./model/hotel')
 
 // let display = () => {
 //     return new Promise(async(resolve, reject) => {
-//         let restaurants = await dbHotel.find({ cuisine: { $nin: ['American', 'Chinees'] }, name: /^Wil/ }, { _id :0 ,"name": 1, "borough": 1, cuisine: 1, restaurant_id: 1 }).limit(100)
+//         let restaurants = await dbHotel.find({ cuisine: { $nin: ['American', 'Chinees'] }, name: /^Wil/ }, { _id: 0, "name": 1, "borough": 1, cuisine: 1, restaurant_id: 1 }).limit(100)
 //         resolve(restaurants)
 //     })
 // }
@@ -343,11 +356,23 @@ let dbHotel = require('./model/hotel')
 
 
 
-// Question 18.  Write a query to replace a document which has restaurant id “41704620 ”.Change all the details except restaurant id without using set and push.
+// Question 18.  Write a query to replace a document which has restaurant id “41704620”.Change all the details except restaurant id without using set and push.
 
 // let display = () => {
 //     return new Promise(async(resolve, reject) => {
-//         let restaurants = await dbHotel.find({ cuisine: { $nin: ['American', 'Chinees'] }, name: /^Wil/ }, { _id :0 ,"name": 1, "borough": 1, cuisine: 1, restaurant_id: 1 }).limit(100)
+//         let restaurants = await dbHotel.update({ restaurant_id: "41704620" }, {
+//             address: {
+//                 building: "417-JMD_Megapolis",
+//                 coord: [-77.777, 77.3314],
+//                 street: "Sohna_Road",
+//                 zipcode: "122018"
+//             },
+//             borough: "Gurgaon",
+//             cuisine: "chicken_65",
+//             grades: [{ date: new Date(), grade: 'A', score: 99.99 }, { date: new Date(), grade: 'A', score: 100 }],
+//             name: "zaika",
+//             restaurant_id: "41704620"
+//         })
 //         resolve(restaurants)
 //     })
 // }
@@ -365,20 +390,29 @@ let dbHotel = require('./model/hotel')
 
 
 
-// Question 19. Write a query to increase score of every grades of all restaurants.
+// Question 19. Write a query to increase score of every grades by 2 of all restaurants.
 
-let display = () => {
-    return new Promise(async(resolve, reject) => {
-        let restaurants = await dbHotel.find({}).limit(100)
-        resolve(restaurants)
-    })
-}
+/***wrong */
 
-display()
-    .then(data => console.log('---------restaurants-------', data, '---------restaurants-------'))
-    .catch(err => {
-        console.log(err)
-    })
+// let display = () => {
+//     return new Promise(async(resolve, reject) => {
+//         let restaurants = await dbHotel.aggregate([{
+//             $group: {
+//                 _id: "$grades.score",
+//                 score: { $push: "$" }
+//             }
+//         }])
+//         resolve(restaurants)
+//     })
+// }
+
+// display()
+//     .then(data => {
+//         console.log('---------restaurants--------', data, '--------restaurants-------')
+//     })
+//     .catch(err => {
+//         console.log(err)
+//     })
 
 
 
