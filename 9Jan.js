@@ -358,32 +358,34 @@ let dbHotel = require('./model/hotel')
 
 // Question 18.  Write a query to replace a document which has restaurant id “41704620”.Change all the details except restaurant id without using set and push.
 
-// let display = () => {
-//     return new Promise(async(resolve, reject) => {
-//         let restaurants = await dbHotel.update({ restaurant_id: "41704620" }, {
-//             address: {
-//                 building: "417-JMD_Megapolis",
-//                 coord: [-77.777, 77.3314],
-//                 street: "Sohna_Road",
-//                 zipcode: "122018"
-//             },
-//             borough: "Gurgaon",
-//             cuisine: "chicken_65",
-//             grades: [{ date: new Date(), grade: 'A', score: 99.99 }, { date: new Date(), grade: 'A', score: 100 }],
-//             name: "zaika",
-//             restaurant_id: "41704620"
-//         })
-//         resolve(restaurants)
-//     })
-// }
+let display = () => {
+    return new Promise(async(resolve, reject) => {
+        let restaurants = await dbHotel.update({ "restaurant_id": "41704620" }, {
+            address: {
+                building: "417-JMD_Megapolis",
+                coord: [-77.777, 77.3314],
+                street: "Sohna_Road",
+                zipcode: "122018"
+            },
+            borough: "Gurgaon",
+            cuisine: "chicken_65",
+            grades: [{ date: new Date(), grade: 'A', score: 99.99 }, { date: new Date(), grade: 'A', score: 100 }],
+            name: "Zaika",
+            restaurant_id: "41704620"
+        }, { new: true, upsert: true, setDefaultsOnInsert: true }).catch(err => {
+            console.log("dsjsjdghj")
+        })
+        resolve(restaurants)
+    })
+}
 
-// display()
-//     .then(data =>
-//         // data.address.coord[1],
-//         console.log('---------restaurants-------', data, '---------restaurants-------'))
-//     .catch(err => {
-//         console.log(err)
-//     })
+display()
+    .then(data =>
+        // data.address.coord[1],
+        console.log('---------restaurants-------', data, '---------restaurants-------'))
+    .catch(err => {
+        console.log(err)
+    })
 
 
 
