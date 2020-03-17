@@ -76,7 +76,6 @@ calculate(5,6,7)
 
 
 
-
 /******************************** Server listening *******************************/
 // app.listen(5521, () => console.log(`server Started on :- PORT ${5521}`))
 app.listen(5521)
